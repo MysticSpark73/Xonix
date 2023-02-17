@@ -32,8 +32,21 @@ namespace Xonix.Common.Grid
             SetupGrid();
         }
 
+        public void ClearGrid() 
+        {
+            for (int i = 0; i < tileMap.Count; i++)
+            {
+                for (int j = 0; j < tileMap[i].Count; j++)
+                {
+                    tileMap[i][j].SetColor(Parameters.grid_color_water);
+                    //also kill enemies and respawn player here
+                }
+            }
+        }
+
         private void SetupGrid() 
         {
+            //possible different configurations of setup ground on grid (manual/ pixel map)
             for (int i = 0; i < tileMap.Count; i++)
             {
                 for (int j = 0; j < tileMap[i].Count; j++)
