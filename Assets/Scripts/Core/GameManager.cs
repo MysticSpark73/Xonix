@@ -1,22 +1,29 @@
 using UnityEngine;
-using Xonix.Core.Events;
+using Xonix.Common.Characters;
 using Xonix.Data;
 
 namespace Xonix.Core
 {
     public class GameManager : MonoBehaviour
     {
-        [SerializeField] private Common.Grid.Grid grid;
+        [SerializeField] private Common.Grid.GridBuilder grid;
+        [SerializeField] private GameObject playerPrefab;
+        [SerializeField] private RectTransform playerContainer;
+        [SerializeField] private RectTransform enemiesContainer;
+
+        private Player player;
+
         private void Awake()
         {
-            EventManager.Swipe += OnSwipe;
-            grid.CreateGrid();
+            CreatePlayer();
+            grid.SetPlayer(player);
+            grid.BuildGrid();
+            player.Init(grid.FindSpawnPos());
+            //Create Player
+            //Setup Player
+            //Create pool of enemies
+            //remove later
             Parameters.SwitchGameState(GameState.Playing);
-        }
-
-        private void OnApplicationQuit()
-        {
-            EventManager.Swipe -= OnSwipe;
         }
 
         // Start is called before the first frame update
@@ -31,9 +38,22 @@ namespace Xonix.Core
         
         }
 
-        private void OnSwipe(Vector2 swipe) 
+        private void StartLevel(int levelIndex) 
         {
-            Debug.Log($"Swiped {swipe}");
+            //calculate enemies amounts
+            //clear grid
+            //reset player
+            //place enemies
+            //run level
         }
+
+        private void CreatePlayer() 
+        {
+            GameObject go = Instantiate(playerPrefab, playerContainer);
+            Player player = go.GetComponent<Player>();
+            this.player = player;
+        }
+
+        
     }
 }
