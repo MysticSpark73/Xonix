@@ -1,4 +1,6 @@
 using UnityEngine;
+using Xonix.Core.Events;
+using Xonix.Data;
 
 namespace Xonix.Core
 {
@@ -7,7 +9,14 @@ namespace Xonix.Core
         [SerializeField] private Common.Grid.Grid grid;
         private void Awake()
         {
+            EventManager.Swipe += OnSwipe;
             grid.CreateGrid();
+            Parameters.SwitchGameState(GameState.Playing);
+        }
+
+        private void OnApplicationQuit()
+        {
+            EventManager.Swipe -= OnSwipe;
         }
 
         // Start is called before the first frame update
@@ -20,6 +29,11 @@ namespace Xonix.Core
         void Update()
         {
         
+        }
+
+        private void OnSwipe(Vector2 swipe) 
+        {
+            Debug.Log($"Swiped {swipe}");
         }
     }
 }
