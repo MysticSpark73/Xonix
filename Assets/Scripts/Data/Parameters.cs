@@ -42,7 +42,7 @@ namespace Xonix.Data
             EventManager.PlayerTakenDamage?.Invoke();
             if (player_hp == 0)
             {
-                SwitchGameState(GameState.Ended);
+                SwitchGameState(GameState.Lost);
             }
         }
 
@@ -89,7 +89,7 @@ namespace Xonix.Data
             EventManager.TimeChanged?.Invoke();
             if (level_time_seconds == 0)
             {
-                SwitchGameState(GameState.Ended);
+                SwitchGameState(GameState.Lost);
             }
         }
 
@@ -105,7 +105,7 @@ namespace Xonix.Data
             EventManager.FillChanged?.Invoke();
             if (current_fill_amount >= level_target_fill)
             {
-                SwitchGameState(GameState.Ended);
+                SwitchGameState(GameState.Won);
                 level_games_played++;
                 AddScore(level_time_seconds);
             }

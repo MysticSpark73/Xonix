@@ -31,20 +31,21 @@ namespace Xonix.Core
             player.Init(grid.FindSpawnPos());
             FillPool(50);
             StartLevel(Parameters.level_games_played);
-            //remove later
-            Parameters.SwitchGameState(GameState.Playing);
         }
 
-        private void StartLevel(int levelIndex) 
+        public void StartLevel(int levelIndex) 
         {
-
-            if (levelIndex >1)
+            if (levelIndex <=1)
             {
-                //spawn 2/3 water and 1/3 ground
+                SpawnEnemies(EnemyType.Water, levelIndex + 1);
             }
-            //1 or 2 water
-            SpawnEnemies(EnemyType.Water, levelIndex + 3);
-            SpawnEnemies(EnemyType.Ground, 2);
+            else
+            {
+                SpawnEnemies(EnemyType.Ground, (levelIndex + 1) / 3);
+                SpawnEnemies(EnemyType.Water, levelIndex + 1 - ((levelIndex + 1) / 3));
+            }
+            Parameters.ResetTime();
+            Parameters.SwitchGameState(GameState.Playing);
         }
 
         private void CreatePlayer() 
@@ -69,6 +70,12 @@ namespace Xonix.Core
         {
             
             pool.AddToPool(enemy);
+        }
+
+        public void ResetBoard() 
+        {
+            grid.ClearGrid();
+            grid.SetupGrid();
         }
 
         private void SpawnEnemies(EnemyType enemy, int count) 

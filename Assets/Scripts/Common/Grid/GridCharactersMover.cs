@@ -18,7 +18,7 @@ namespace Xonix.Common.Grid
 
         private GridBuilder grid;
 
-        public GridCharactersMover(GridBuilder grd) 
+        public GridCharactersMover(GridBuilder grd)
         {
             grid = grd;
             enemies = new List<Enemy>();
@@ -45,7 +45,7 @@ namespace Xonix.Common.Grid
 
         #endregion
 
-        public bool IsEnemySpawnExcluded(Vector2 exc) 
+        public bool IsEnemySpawnExcluded(Vector2 exc)
         {
             if (exc == playerSpawnPos)
             {
@@ -61,7 +61,7 @@ namespace Xonix.Common.Grid
             return false;
         }
 
-        public void MovePlayer() 
+        public void MovePlayer()
         {
             if (player.MoveDirection == Vector2.zero)
             {
@@ -86,7 +86,7 @@ namespace Xonix.Common.Grid
             }
         }
 
-        public void MoveEnemies() 
+        public void MoveEnemies()
         {
             enemiesMoveTime += Time.deltaTime;
             if (enemiesMoveTime >= Parameters.enemies_move_delay)
@@ -104,9 +104,24 @@ namespace Xonix.Common.Grid
             }
         }
 
-        public void Damage() 
+        public void Damage()
         {
             player.TakeDamage();
+        }
+
+        public void ResetPlayer() 
+        {
+            player.SetPos(playerSpawnPos);
+        }
+
+        public void RemoveEnemies() 
+        {
+            foreach (var e in enemies)
+            {
+                e.Kill();
+                GameManager.Instance.ReturnToPool(e);
+            }
+            enemies.Clear();
         }
 
         public void CheckKillEnemy(Vector2 point) 

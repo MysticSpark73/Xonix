@@ -61,7 +61,23 @@ namespace Xonix.Common.Grid
                 for (int j = 0; j < tileMap[i].Count; j++)
                 {
                     tileMap[i][j].SetColor(Parameters.grid_color_water);
-                    //also kill enemies and respawn player here
+                    charactersMover.RemoveEnemies();
+                    charactersMover.ResetPlayer();
+                }
+            }
+        }
+
+        public void SetupGrid()
+        {
+            //possible different configurations of setup ground on grid (manual/ pixel map)
+            for (int i = 0; i < tileMap.Count; i++)
+            {
+                for (int j = 0; j < tileMap[i].Count; j++)
+                {
+                    if (i <= 1 || i >= tileMap.Count - 2 || j <= 1 || j >= tileMap[i].Count - 2)
+                    {
+                        tileMap[i][j].SetColor(Parameters.grid_color_ground);
+                    }
                 }
             }
         }
@@ -323,21 +339,6 @@ namespace Xonix.Common.Grid
             FillArea(new Vector2(point.x, point.y + 1));
             FillArea(new Vector2(point.x, point.y - 1));
 
-        }
-
-        private void SetupGrid()
-        {
-            //possible different configurations of setup ground on grid (manual/ pixel map)
-            for (int i = 0; i < tileMap.Count; i++)
-            {
-                for (int j = 0; j < tileMap[i].Count; j++)
-                {
-                    if (i <= 1 || i >= tileMap.Count - 2 || j <= 1 || j >= tileMap[i].Count - 2)
-                    {
-                        tileMap[i][j].SetColor(Parameters.grid_color_ground);
-                    }
-                }
-            }
         }
 
         private float GetFilledAmount() 
