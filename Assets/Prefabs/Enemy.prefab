@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6116994726580793612
+--- !u!1 &1458891659536765118
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,24 +8,24 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6116994726580793611}
-  - component: {fileID: 6116994726580793609}
-  - component: {fileID: 6116994726580793610}
-  - component: {fileID: 4668422319969820635}
+  - component: {fileID: 1458891659536765119}
+  - component: {fileID: 1458891659536765117}
+  - component: {fileID: 1458891659536765116}
+  - component: {fileID: 4777213989299643604}
   m_Layer: 5
-  m_Name: Player
+  m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &6116994726580793611
+--- !u!224 &1458891659536765119
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6116994726580793612}
+  m_GameObject: {fileID: 1458891659536765118}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -39,21 +39,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 32, y: 32}
   m_Pivot: {x: 0, y: 1}
---- !u!222 &6116994726580793609
+--- !u!222 &1458891659536765117
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6116994726580793612}
+  m_GameObject: {fileID: 1458891659536765118}
   m_CullTransparentMesh: 1
---- !u!114 &6116994726580793610
+--- !u!114 &1458891659536765116
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6116994726580793612}
+  m_GameObject: {fileID: 1458891659536765118}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
@@ -77,19 +77,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4668422319969820635
+--- !u!114 &4777213989299643604
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6116994726580793612}
+  m_GameObject: {fileID: 1458891659536765118}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 612d4a265e1034e47959847d67190b99, type: 3}
+  m_Script: {fileID: 11500000, guid: 8c7044a7c6a0a9340a46433074487fc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 6116994726580793610}
-  self: {fileID: 6116994726580793611}
-  walkSprite: {fileID: 21300000, guid: 3ba8a95d36cb2eb48829d69db485e5d7, type: 3}
-  swimSprite: {fileID: 21300000, guid: b6c358b9f02e1d4468f5b4d189b7c234, type: 3}
+  image: {fileID: 1458891659536765116}
+  self: {fileID: 1458891659536765119}
+  waterEnemySprite: {fileID: 21300000, guid: 93d80407bf2e98944abae7ca23cd275e, type: 3}
+  groundEnemySprite: {fileID: 21300000, guid: 31a0d1ac7ac740e4389a7a477466aeb3, type: 3}

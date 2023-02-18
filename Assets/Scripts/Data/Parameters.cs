@@ -47,9 +47,13 @@ namespace Xonix.Data
 
         public static readonly float level_target_fill = .75f;
 
+        public static float current_fill_amount { get; private set; } = 0;
+
         public static int level_score { get; private set; } = 0;
         public static int level_time_seconds { get; private set; } = 60;
         public static int level_games_played { get; private set; } = 0;
+
+        public static void SetFillAmount(float value) => current_fill_amount = value;
 
         #endregion
 

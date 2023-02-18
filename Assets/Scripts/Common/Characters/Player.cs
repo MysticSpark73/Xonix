@@ -12,6 +12,8 @@ namespace Xonix.Common.Characters
         [SerializeField] private Sprite walkSprite;
         [SerializeField] private Sprite swimSprite;
 
+        public Vector2 MoveDirection => moveDirection;
+
         private Vector2 moveDirection;
         private Vector2 spawnPos;
         private bool isSwiming;
@@ -20,7 +22,7 @@ namespace Xonix.Common.Characters
         {
             spawnPos = GridPosToAnchor(gridPos);
             self.anchoredPosition = spawnPos;
-            image.sprite = walkSprite;
+            SetIsSwiming(false);
             Subscribe();
         }
 
@@ -34,11 +36,13 @@ namespace Xonix.Common.Characters
             EventManager.Swipe -= OnSwipe;
         }
 
-        public Vector2 GetMoveDirection() => moveDirection;
-
         public bool GetIsSwiming() => isSwiming;
 
-        public void SetIsSwiming(bool value) => isSwiming = value;
+        public void SetIsSwiming(bool value)
+        {
+            isSwiming = value;
+            image.sprite = isSwiming ? swimSprite : walkSprite;
+        }
 
         public void SetPos(Vector2 gridPos) 
         {
@@ -48,7 +52,7 @@ namespace Xonix.Common.Characters
         public void Stop() 
         {
             moveDirection = Vector2.zero;
-            isSwiming = false;
+            SetIsSwiming(false);
         }
 
         public void TakeDamage() 
@@ -74,7 +78,7 @@ namespace Xonix.Common.Characters
 
         private Vector2 GridPosToAnchor(Vector2 gridIndex) 
         {
-            return gridIndex * new Vector2(1, -1) * Parameters.grid_tile_size + Parameters.grid_tile_offset;
+            return gridIndex * new Vector2(1, -1) * Parameters.grid_tile_size;
         }
 
     }
