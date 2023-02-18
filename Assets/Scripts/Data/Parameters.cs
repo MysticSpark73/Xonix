@@ -35,7 +35,7 @@ namespace Xonix.Data
         #region Player
 
         public static readonly float player_move_delay = .05f;
-        public static int player_hp { get; private set; } = 30;
+        public static int player_hp { get; private set; } = 3;
 
         public static void LoseLife()
         {
@@ -51,6 +51,7 @@ namespace Xonix.Data
         public static void ResetPlayerHP() 
         {
             player_hp = 3;
+            EventManager.PlayerTakenDamage?.Invoke();
         }
 
         #endregion
