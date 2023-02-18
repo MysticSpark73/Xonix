@@ -30,7 +30,7 @@ namespace Xonix.Core
             grid.BuildGrid();
             player.Init(grid.FindSpawnPos());
             FillPool(50);
-            StartLevel(Parameters.level_games_played);
+            Parameters.SwitchGameState(GameState.Pause);
         }
 
         public void StartLevel(int levelIndex) 
@@ -45,6 +45,7 @@ namespace Xonix.Core
                 SpawnEnemies(EnemyType.Water, levelIndex + 1 - ((levelIndex + 1) / 3));
             }
             Parameters.ResetTime();
+            Parameters.ResetFillAmount();
             Parameters.SwitchGameState(GameState.Playing);
         }
 
@@ -76,6 +77,16 @@ namespace Xonix.Core
         {
             grid.ClearGrid();
             grid.SetupGrid();
+        }
+
+        public void PauseGame() 
+        {
+            Parameters.SwitchGameState(GameState.Pause);
+        }
+
+        public void UnpauseGame() 
+        {
+            Parameters.SwitchGameState(GameState.Playing);
         }
 
         private void SpawnEnemies(EnemyType enemy, int count) 

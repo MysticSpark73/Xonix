@@ -68,13 +68,14 @@ namespace Xonix.Data
         public static int level_time_seconds { get; private set; } = 60;
         public static int level_games_played { get; private set; } = 0;
 
+        public static void ResetGames() => level_games_played = 0;
+
         public static void KillEnemy() => AddScore(kill_enemy_score);
 
         public static void AddScore(int value) 
         {
             level_score += value;
             EventManager.ScoreChanged?.Invoke();
-            Debug.Log($"Score = {level_score}, value = {value}");
         }
 
         public static void ResetScore() 

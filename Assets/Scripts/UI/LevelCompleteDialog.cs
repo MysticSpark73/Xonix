@@ -23,7 +23,6 @@ namespace Xonix.UI
 
         private void StartLevel() 
         {
-            Debug.Log("Pressed Button!");
             GameManager.Instance.ResetBoard();
             GameManager.Instance.StartLevel(Parameters.level_games_played);
             gameObject.SetActive(false);

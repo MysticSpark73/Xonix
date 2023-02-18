@@ -7,6 +7,7 @@ namespace Xonix.UI
     public class DialogManager : MonoBehaviour
     {
         [SerializeField] private LevelCompleteDialog completeDialog;
+        [SerializeField] private MainScreenDialog mainScreen;
 
         private void Awake()
         {
@@ -20,10 +21,20 @@ namespace Xonix.UI
 
         private void OnGameStateChanged(GameState state)
         {
-            if (state == GameState.Won)
+            switch (state)
             {
-                completeDialog.Init();
+                case GameState.Playing:
+                    break;
+                case GameState.Won:
+                    completeDialog.Init();
+                    break;
+                case GameState.Lost:
+                    mainScreen.Init();
+                    break;
             }
+           
         }
+
+
     }
 }

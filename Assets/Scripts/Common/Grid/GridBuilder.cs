@@ -49,9 +49,9 @@ namespace Xonix.Common.Grid
             charactersMover.SetPlayerSpawnPos(FindSpawnPos());
             SetupGrid();
             trailTiles.Add(charactersMover.GetPlayerSpawnPos());
-            float tempFill = Parameters.current_fill_amount;
-            Parameters.SetFillAmount(GetFilledAmount());
-            Parameters.AddScore((int) ((Parameters.current_fill_amount - tempFill) * 100));
+            //float tempFill = Parameters.current_fill_amount;
+            //Parameters.SetFillAmount(GetFilledAmount());
+            //Parameters.AddScore((int) ((Parameters.current_fill_amount - tempFill) * 100));
         }
 
         public void ClearGrid()
