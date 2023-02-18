@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Xonix.Audio;
 using Xonix.Core.Events;
 using Xonix.Data;
 
@@ -59,6 +60,7 @@ namespace Xonix.Common.Characters
         public void TakeDamage() 
         {
             Stop();
+            AudioController.Instance.PlayDamage();
             Parameters.LoseLife();
             if (Parameters.player_hp == 0)
             {

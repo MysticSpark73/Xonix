@@ -2,6 +2,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Xonix.Audio;
 using Xonix.Core;
 using Xonix.Data;
 
@@ -12,8 +13,6 @@ namespace Xonix
         [SerializeField] RectTransform self;
         [SerializeField] TextMeshProUGUI insertACoin;
         [SerializeField] Button button;
-
-        private Color transparent = new Color(0, 0, 0, 0);
 
         private void Awake()
         {
@@ -33,6 +32,7 @@ namespace Xonix
 
         private void ResetGame() 
         {
+            AudioController.Instance.PlayStart();
             Hide();
             Parameters.ResetScore();
             Parameters.ResetPlayerHP();

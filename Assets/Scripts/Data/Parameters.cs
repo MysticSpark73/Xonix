@@ -1,4 +1,5 @@
 using UnityEngine;
+using Xonix.Audio;
 using Xonix.Core.Events;
 
 namespace Xonix.Data
@@ -43,6 +44,7 @@ namespace Xonix.Data
             if (player_hp == 0)
             {
                 SwitchGameState(GameState.Lost);
+                AudioController.Instance.PlayLose();
             }
         }
 
@@ -91,6 +93,7 @@ namespace Xonix.Data
             if (level_time_seconds == 0)
             {
                 SwitchGameState(GameState.Lost);
+                AudioController.Instance.PlayLose();
             }
         }
 
@@ -107,6 +110,7 @@ namespace Xonix.Data
             if (current_fill_amount >= level_target_fill)
             {
                 SwitchGameState(GameState.Won);
+                AudioController.Instance.PlayWin();
                 level_games_played++;
                 AddScore(level_time_seconds);
             }
