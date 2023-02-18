@@ -22,7 +22,7 @@ namespace Xonix.Common.Grid
         private List<Vector2> trailTiles;
         private List<List<Tile>> tileMap;
 
-        public void Init() 
+        public void Init()
         {
             tileMap = new List<List<Tile>>();
             trailTiles = new List<Vector2>();
@@ -64,7 +64,7 @@ namespace Xonix.Common.Grid
             }
         }
 
-        public void AddToTrail(Vector2 pos) 
+        public void AddToTrail(Vector2 pos)
         {
             trailTiles.Add(pos);
         }
@@ -202,6 +202,7 @@ namespace Xonix.Common.Grid
 
         public void ClearTrail(Vector2 currentPlayerPos, bool delete = false)
         {
+            //repaint
             foreach (var vec in trailTiles)
             {
                 if (tileMap[(int)vec.y][(int)vec.x].GetColor() != Parameters.grid_color_ground)
@@ -209,8 +210,116 @@ namespace Xonix.Common.Grid
                     tileMap[(int)vec.y][(int)vec.x].SetColor(delete ? Parameters.grid_color_water : Parameters.grid_color_ground);
                 }
             }
+            if (!delete)
+            {
+                List<Vector2> points = FindTrailFillPoint(trailTiles);
+                if (points.Count > 0)
+                {
+                    int[] areas = new int[points.Count];
+                    for (int i = 0; i < points.Count; i++)
+                    {
+                        areas[i] = CalculateArea(points[i]);
+                    }
+                    FillArea(points[areas[0] < areas[1] ? 0 : 1]);
+                    //FillArea(points[0]);
+
+                }
+            }
             trailTiles.Clear();
             trailTiles.Add(currentPlayerPos);
+        }
+
+        private List<Vector2> FindTrailFillPoint(List<Vector2> trail)
+        {
+            List<Vector2> points = new List<Vector2>();
+            foreach (var t in trail)
+            {
+                if (t.x + 1 < GridWidth && t.x - 1 > 0)
+                {
+                    if (GetTileColor(new Vector2(t.x + 1, t.y)) == GetTileColor(new Vector2(t.x - 1, t.y))
+                        && GetTileColor(new Vector2(t.x + 1, t.y)) == Parameters.grid_color_water)
+                    {
+                        points.Add(new Vector2(t.x + 1, t.y));
+                        points.Add(new Vector2(t.x - 1, t.y));
+                        return points;
+                    }
+                }
+                if (t.y + 1 < GridHeight && t.y - 1 > 0)
+                {
+                    if (GetTileColor(new Vector2(t.x, t.y + 1)) == GetTileColor(new Vector2(t.x, t.y - 1))
+                        && GetTileColor(new Vector2(t.x, t.y + 1)) == Parameters.grid_color_water)
+                    {
+                        points.Add(new Vector2(t.x, t.y + 1));
+                        points.Add(new Vector2(t.x, t.y - 1));
+                        return points;
+                    }
+                }
+
+            }
+            return points;
+        }
+
+        private int CalculateArea(Vector2 point, List<Vector2> excl = null)
+        {
+            int area = 0;
+            if (point.x >= GridWidth || point.x < 0 || point.y >= GridHeight || point.y < 0)
+            {
+                return area;
+            }
+            if (GetTileColor(point) != Parameters.grid_color_water)
+            {
+                return area;
+            }
+            if (excl == null)
+            {
+                excl = new List<Vector2>();
+            }
+            area++;
+            excl.Add(point);
+
+            Vector2 xP = new Vector2(point.x + 1, point.y);
+            Vector2 xM = new Vector2(point.x - 1, point.y);
+            Vector2 yP = new Vector2(point.x, point.y + 1);
+            Vector2 yM = new Vector2(point.x, point.y - 1);
+            if (!excl.Contains(xP))
+            {
+                area += CalculateArea(xP, excl);
+            }
+            if (!excl.Contains(xM))
+            {
+                area += CalculateArea(xM, excl);
+            }
+            if (!excl.Contains(yP))
+            {
+                area += CalculateArea(yP, excl);
+            }
+            if (!excl.Contains(yM))
+            {
+                area += CalculateArea(yM, excl);
+            }
+            return area;
+        }
+
+        private void FillArea(Vector2 point)
+        {
+            if (point.x >= GridWidth || point.x < 0 || point.y >= GridHeight || point.y < 0)
+            {
+                return;
+            }
+            if (GetTileColor(point) == Parameters.grid_color_water)
+            {
+                SetTileColor(point, Parameters.grid_color_ground);
+                charactersMover.CheckKillEnemy(point);
+            }
+            else
+            {
+                return;
+            }
+            FillArea(new Vector2(point.x + 1, point.y));
+            FillArea(new Vector2(point.x - 1, point.y));
+            FillArea(new Vector2(point.x, point.y + 1));
+            FillArea(new Vector2(point.x, point.y - 1));
+
         }
 
         private void SetupGrid()

@@ -49,6 +49,11 @@ namespace Xonix.Common.Characters
             moveDirection *= flip;
         }
 
+        public void Kill() 
+        {
+            gameObject.SetActive(false);
+        }
+
         private Vector2 RandomizeMoveDirection() => new Vector2(Random.Range(0, 2) % 2 == 0 ? 1 : -1, Random.Range(0, 1) % 2 == 0 ? 1 : -1);
 
         private Vector2 GridPosToAnchor(Vector2 gridIndex) => gridIndex * new Vector2(1, -1) * Parameters.grid_tile_size;

@@ -108,6 +108,18 @@ namespace Xonix.Common.Grid
             player.TakeDamage();
         }
 
+        public void CheckKillEnemy(Vector2 point) 
+        {
+            foreach (var enemy in enemies)
+            {
+                if (enemy.GridPos == point)
+                {
+                    enemy.Kill();
+                    return;
+                }
+            }
+        }
+
         public void OnTakenDamage() 
         {
             player.SetPos(playerSpawnPos);
