@@ -24,6 +24,7 @@ namespace Xonix.Data
         
         public static readonly int grid_tile_size = 32;
         public static readonly Vector2 grid_tile_offset = new Vector2(grid_tile_size / 2, -grid_tile_size / 2);
+        public static readonly Vector2 grid_y_flip_vector = new Vector2(1, -1);
 
         public static readonly Color grid_color_water = new Color(0.02352941f, 0.06666667f, 0.1647059f, 1);
         public static readonly Color grid_color_ground = new Color(0, 0.6313726f, 0.6705883f, 1);
@@ -35,7 +36,11 @@ namespace Xonix.Data
         public static readonly float player_move_delay = .05f;
         public static int player_hp { get; private set; } = 3;
 
-        public static void LoseLife() => Mathf.Max(--player_hp, 0);
+        public static void LoseLife()
+        {
+            Mathf.Max(--player_hp, 0);
+            EventManager.PlayerTakenDamage?.Invoke();
+        }
 
         #endregion
         #region Enemies

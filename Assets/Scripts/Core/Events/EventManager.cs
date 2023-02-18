@@ -9,6 +9,6 @@ namespace Xonix.Core.Events
 
         public static Action<Vector2> Swipe;
 
-        public static Action TookDamage;
+        public static Action PlayerTakenDamage;
     }
 }

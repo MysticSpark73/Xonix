@@ -13,9 +13,11 @@ namespace Xonix.Common.Characters
         [SerializeField] private Sprite swimSprite;
 
         public Vector2 MoveDirection => moveDirection;
+        public Vector2 GridPos => gridPos;
 
         private Vector2 moveDirection;
         private Vector2 spawnPos;
+        private Vector2 gridPos;
         private bool isSwiming;
 
         public void Init(Vector2 gridPos) 
@@ -46,6 +48,7 @@ namespace Xonix.Common.Characters
 
         public void SetPos(Vector2 gridPos) 
         {
+            this.gridPos = gridPos;
             self.anchoredPosition = GridPosToAnchor(gridPos);
         }
 
@@ -59,7 +62,6 @@ namespace Xonix.Common.Characters
         {
             Stop();
             Parameters.LoseLife();
-            EventManager.TookDamage?.Invoke();
             if (Parameters.player_hp == 0)
             {
                 Application.Quit();

@@ -14,29 +14,22 @@ namespace Xonix.Common.Grid
         [SerializeField] private RectTransform tilesContainer;
         [SerializeField] private RectTransform playerContainer;
         [SerializeField] private RectTransform enemiesContainer;
-        [SerializeField] private GameObject playerPrefab;
 
-        private Player player;
-        private Vector2 playerGridPos;
-        private float playerMoveTime;
-        private float enemiesMoveTime;
+        public int GridWidth => tileMap[0].Count;
+        public int GridHeight => tileMap.Count;
 
+        private GridCharactersMover charactersMover;
         private List<Vector2> trailTiles;
-        private List<Enemy> enemies;
         private List<List<Tile>> tileMap;
 
         public void Init() 
         {
             tileMap = new List<List<Tile>>();
             trailTiles = new List<Vector2>();
-            enemies = new List<Enemy>();
-            EventManager.TookDamage += OnTookDamage;
+            charactersMover = new GridCharactersMover(this);
+            EventManager.PlayerTakenDamage += OnTakenDamage;
         }
 
-        private void Awake()
-        {
-            
-        }
 
         public void BuildGrid()
         {
@@ -53,9 +46,9 @@ namespace Xonix.Common.Grid
                 }
                 tileMap.Add(row);
             }
-            playerGridPos = FindSpawnPos();
+            charactersMover.SetPlayerPosition(FindSpawnPos());
             SetupGrid();
-            trailTiles.Add(FindSpawnPos());
+            trailTiles.Add(charactersMover.GetPlayerSpawnPos());
             Parameters.SetFillAmount(GetFilledAmount());
         }
 
@@ -69,6 +62,11 @@ namespace Xonix.Common.Grid
                     //also kill enemies and respawn player here
                 }
             }
+        }
+
+        public void AddToTrail(Vector2 pos) 
+        {
+            trailTiles.Add(pos);
         }
 
         private void SetupGrid()
@@ -107,7 +105,7 @@ namespace Xonix.Common.Grid
             {
                 for (int j = 0; j < tileMap[i].Count; j++)
                 {
-                    if (IsExcluded(new Vector2(j, i)))
+                    if (charactersMover.IsEnemySpawnExcluded(new Vector2(j, i)))
                     {
                         continue;
                     }
@@ -133,38 +131,26 @@ namespace Xonix.Common.Grid
             }
         }
 
-        private bool IsExcluded(Vector2 exc) 
+        public void SetPlayer(Player player) => charactersMover.SetPlayer(player);
+
+        public void AddEnemy(Enemy enemy) => charactersMover.AddEnemy(enemy);
+
+        public Color GetTileColor(Vector2 index)
         {
-            if (exc == FindSpawnPos())
-            {
-                return true;
-            }
-            foreach (var enemy in enemies)
-            {
-                if (enemy.GridPos == exc)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public void SetPlayer(Player player) => this.player = player;
-
-        public void AddEnemy(Enemy enemy)
-        { 
-            enemies.Add(enemy);
-            enemy.SetPos(FindEnemySpawnPos(enemy.EnemyType));
-        }
-
-        public Color GetTileColor(int x, int y)
-        {
-            if (x < 0 || x >= tileMap[0].Count || y < 0 || y >= tileMap.Count)
+            if (index.x < 0 || index.x >= GridWidth || index.y < 0 || index.y >= GridHeight)
             {
                 return Color.magenta;
             }
-            return tileMap[y][x].GetColor();
+            return tileMap[(int)index.y][(int)index.x].GetColor();
+        }
+
+        public void SetTileColor(Vector2 index, Color color) 
+        {
+            if (index.x < 0 || index.x >= GridWidth || index.y < 0 || index.y >= GridHeight)
+            {
+                return;
+            }
+            tileMap[(int)index.y][(int)index.x].SetColor(color);
         }
 
         private Tile CreateTile(int x, int y)
@@ -182,56 +168,11 @@ namespace Xonix.Common.Grid
 
         private void Update()
         {
-            MovePlayer();
-            MoveEnemies();
+            charactersMover.MovePlayer();
+            charactersMover.MoveEnemies();
         }
 
-        private void MovePlayer()
-        {
-            if (player.MoveDirection == Vector2.zero)
-            {
-                playerMoveTime = 0;
-                return;
-            }
-            playerMoveTime += Time.deltaTime;
-            if (playerMoveTime >= Parameters.player_move_delay)
-            {
-                playerMoveTime = 0;
-                if (IsCanMove(playerGridPos, player.MoveDirection))
-                {
-                    playerGridPos += player.MoveDirection * new Vector2(1, -1);
-                    trailTiles.Add(playerGridPos);
-                    player.SetPos(playerGridPos);
-                    CheckGroundColor(playerGridPos);
-                }
-                else
-                {
-                    player.Stop();
-                    ClearTrail();
-                }
-            }
-
-        }
-
-        private void MoveEnemies() 
-        {
-            enemiesMoveTime += Time.deltaTime;
-            if (enemiesMoveTime >= Parameters.enemies_move_delay)
-            {
-                enemiesMoveTime = 0;
-            }
-            else
-            {
-                return;
-            }
-            foreach (var enemy in enemies)
-            {
-                enemy.Bounce(FindFlipVector(FindCornerTiles(enemy.GridPos, enemy.MoveDirection, enemy.EnemyType)));
-                enemy.SetPos(enemy.GridPos + enemy.MoveDirection * new Vector2(1, -1));
-            }
-        }
-
-        private bool[] FindCornerTiles(Vector2 pos, Vector2 dir, EnemyType enemyType) 
+        public bool[] FindCornerTiles(Vector2 pos, Vector2 dir, EnemyType enemyType) 
         {
             //x, -y, x-y
             bool[] cornerTiles = new bool[3];
@@ -244,23 +185,10 @@ namespace Xonix.Common.Grid
             else
             {
                 tempCol = tileMap[ (int) pos.y][ (int) (pos.x + dir.x)].GetColor();
-                if (tempCol == Parameters.grid_color_ground)
+                cornerTiles[0] = IsObstacleColor(tempCol, enemyType);
+                if (new Vector2(pos.x + dir.x, pos.y) == charactersMover.GetPlayerPos())
                 {
-                    if (enemyType == EnemyType.Water)
-                    {
-                        cornerTiles[0] = true;
-                    }
-                }
-                if (tempCol == Parameters.grid_color_water)
-                {
-                    if (enemyType == EnemyType.Ground)
-                    {
-                        cornerTiles[0] = true;
-                    }
-                }
-                if (tempCol == Parameters.grid_color_trail)
-                {
-                    player.TakeDamage();
+                    charactersMover.Damage();
                     cornerTiles[0] = true;
                 }
             }
@@ -272,122 +200,51 @@ namespace Xonix.Common.Grid
             else
             {
                 tempCol = tileMap[ (int) (pos.y - dir.y)][ (int) pos.x].GetColor();
-                if (tempCol == Parameters.grid_color_ground)
-                {
-                    if (enemyType == EnemyType.Water)
-                    {
-                        cornerTiles[1] = true;
-                    }
-                }
-                if (tempCol == Parameters.grid_color_water)
-                {
-                    if (enemyType == EnemyType.Ground)
-                    {
-                        cornerTiles[1] = true;
-                    }
-                }
-                if (tempCol == Parameters.grid_color_trail)
+                cornerTiles[1] = IsObstacleColor(tempCol, enemyType);
+                if (new Vector2(pos.x ,pos.y - dir.y) == charactersMover.GetPlayerPos())
                 {
                     cornerTiles[1] = true;
-                    player.TakeDamage();
+                    charactersMover.Damage();
                 }
             }
             if (!cornerTiles[2])
             {
                 tempCol = tileMap[(int)(pos.y - dir.y)][(int)(pos.x + dir.x)].GetColor();
-                if (tempCol == Parameters.grid_color_ground)
-                {
-                    if (enemyType == EnemyType.Water)
-                    {
-                        cornerTiles[2] = true;
-                    }
-                }
-                if (tempCol == Parameters.grid_color_water)
-                {
-                    if (enemyType == EnemyType.Ground)
-                    {
-                        cornerTiles[2] = true;
-                    }
-                }
-                if (tempCol == Parameters.grid_color_trail)
+                cornerTiles[2] = IsObstacleColor(tempCol, enemyType);
+                if (new Vector2(pos.x + dir.x, pos.y - dir.y) == charactersMover.GetPlayerPos())
                 {
                     cornerTiles[2] = true;
-                    player.TakeDamage();
+                    charactersMover.Damage();
                 }
             }
             return cornerTiles;
         }
 
-        private Vector2 FindFlipVector(bool[] cornerTiles) 
+        public bool IsObstacleColor(Color color, EnemyType enemy) 
         {
-            if (cornerTiles.All(ct => ct == true))
-            {
-                return Vector2.one * -1;
-            }
-            if (cornerTiles[2])
-            {
-                if (cornerTiles[0])
-                {
-                    return new Vector2(-1, 1);
-                }
-                if (cornerTiles[1])
-                {
-                    return new Vector2(1, -1);
-                }
-                return Vector2.one * -1;
-            }
-            return Vector2.one;
-        }
-
-        private Color GetNextTilecolor(Vector2 pos, Vector2 dir) 
-        {
-            Vector2 res =  pos + dir * new Vector2(1, -1);
-            if (res.x < 0 || res.y < 0 || res.x >= tileMap[0].Count || res.y >= tileMap.Count)
-            {
-                return Color.magenta;
-            }
-            return tileMap[ (int) res.y][(int) res.x].GetColor();
-        }
-
-        private bool IsCanMove(Vector2 gridPos, Vector2 direction) 
-        {
-            Vector2 temp = gridPos + direction * new Vector2(1, -1);
-            if (temp.x < 0 || temp.y < 0 || temp.x >= tileMap[0].Count || temp.y >= tileMap.Count)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        private void CheckGroundColor(Vector2 playerGridPos)
-        {
-            Color color = GetTileColor((int)playerGridPos.x, (int)playerGridPos.y);
-
-            if (color == Parameters.grid_color_water)
-            {
-                tileMap[(int)playerGridPos.y][(int)playerGridPos.x].SetColor(Parameters.grid_color_trail);
-                if (!player.GetIsSwiming())
-                {
-                    player.SetIsSwiming(true);
-                }
-            }
-
             if (color == Parameters.grid_color_ground)
             {
-                if (player.GetIsSwiming())
+                if (enemy == EnemyType.Water)
                 {
-                    player.Stop();
-                    ClearTrail();
+                    return true;
                 }
             }
-
+            if (color == Parameters.grid_color_water)
+            {
+                if (enemy == EnemyType.Ground)
+                {
+                    return true;
+                }
+            }
             if (color == Parameters.grid_color_trail)
             {
-                player.TakeDamage();
+                charactersMover.Damage();
+                return true;
             }
+            return false;
         }
 
-        private void ClearTrail(bool delete = false) 
+        public void ClearTrail(Vector2 currentPlayerPos, bool delete = false) 
         {
             foreach (var vec in trailTiles)
             {
@@ -397,14 +254,12 @@ namespace Xonix.Common.Grid
                 }
             }
             trailTiles.Clear();
-            trailTiles.Add(playerGridPos);
+            trailTiles.Add(currentPlayerPos);
         }
 
-        private void OnTookDamage() 
+        private void OnTakenDamage() 
         {
-            playerGridPos = FindSpawnPos();
-            ClearTrail(true);
-            player.SetPos(playerGridPos);
+            charactersMover.OnTakenDamage();
         }
 
     }
