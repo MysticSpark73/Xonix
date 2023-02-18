@@ -49,7 +49,9 @@ namespace Xonix.Common.Grid
             charactersMover.SetPlayerSpawnPos(FindSpawnPos());
             SetupGrid();
             trailTiles.Add(charactersMover.GetPlayerSpawnPos());
+            float tempFill = Parameters.current_fill_amount;
             Parameters.SetFillAmount(GetFilledAmount());
+            Parameters.AddScore((int) ((Parameters.current_fill_amount - tempFill) * 100));
         }
 
         public void ClearGrid()
@@ -221,9 +223,10 @@ namespace Xonix.Common.Grid
                         areas[i] = CalculateArea(points[i]);
                     }
                     FillArea(points[areas[0] < areas[1] ? 0 : 1]);
-                    //FillArea(points[0]);
-
                 }
+                float tempFill = Parameters.current_fill_amount;
+                Parameters.SetFillAmount(GetFilledAmount());
+                Parameters.AddScore((int)((Parameters.current_fill_amount - tempFill) * 100));
             }
             trailTiles.Clear();
             trailTiles.Add(currentPlayerPos);
@@ -344,7 +347,7 @@ namespace Xonix.Common.Grid
             {
                 counter += row.Count(t => t.GetColor() == Parameters.grid_color_ground);
             }
-            return counter / (tileMap.Count * tileMap[0].Count);
+            return (float)((float)counter /(float)(tileMap.Count * tileMap[0].Count));
         }
 
         private Tile CreateTile(int x, int y)
@@ -362,13 +365,21 @@ namespace Xonix.Common.Grid
 
         private void Update()
         {
-            charactersMover.MovePlayer();
-            charactersMover.MoveEnemies();
+            if (Parameters.GameState == GameState.Playing)
+            {
+                charactersMover.MovePlayer();
+                charactersMover.MoveEnemies();
+            }
         }
 
         private void OnTakenDamage() 
         {
             charactersMover.OnTakenDamage();
+        }
+
+        private void OnApplicationQuit()
+        {
+            EventManager.PlayerTakenDamage -= OnTakenDamage;
         }
 
     }

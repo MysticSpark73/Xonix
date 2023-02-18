@@ -34,12 +34,21 @@ namespace Xonix.Data
         #region Player
 
         public static readonly float player_move_delay = .05f;
-        public static int player_hp { get; private set; } = 3;
+        public static int player_hp { get; private set; } = 30;
 
         public static void LoseLife()
         {
             Mathf.Max(--player_hp, 0);
             EventManager.PlayerTakenDamage?.Invoke();
+            if (player_hp == 0)
+            {
+                SwitchGameState(GameState.Ended);
+            }
+        }
+
+        public static void ResetPlayerHP() 
+        {
+            player_hp = 3;
         }
 
         #endregion
@@ -51,6 +60,7 @@ namespace Xonix.Data
         #region level
 
         public static readonly float level_target_fill = .75f;
+        public static readonly int kill_enemy_score = 30;
 
         public static float current_fill_amount { get; private set; } = 0;
 
@@ -58,7 +68,63 @@ namespace Xonix.Data
         public static int level_time_seconds { get; private set; } = 60;
         public static int level_games_played { get; private set; } = 0;
 
-        public static void SetFillAmount(float value) => current_fill_amount = value;
+        public static void KillEnemy() => AddScore(kill_enemy_score);
+
+        public static void AddScore(int value) 
+        {
+            level_score += value;
+            EventManager.ScoreChanged?.Invoke();
+            Debug.Log($"Score = {level_score}, value = {value}");
+        }
+
+        public static void ResetScore() 
+        {
+            level_score = 0;
+            EventManager.ScoreChanged?.Invoke();
+        }
+
+        public static void SubtractSeconds(int time) 
+        {
+            level_time_seconds = Mathf.Max(level_time_seconds - time, 0);
+            EventManager.TimeChanged?.Invoke();
+            if (level_time_seconds == 0)
+            {
+                SwitchGameState(GameState.Ended);
+            }
+        }
+
+        public static void ResetTime() 
+        {
+            level_time_seconds = 60;
+            EventManager.TimeChanged?.Invoke();
+        }
+
+        public static void SetFillAmount(float value)
+        {
+            current_fill_amount = value;
+            EventManager.FillChanged?.Invoke();
+            if (current_fill_amount >= level_target_fill)
+            {
+                SwitchGameState(GameState.Ended);
+                level_games_played++;
+                AddScore(level_time_seconds);
+            }
+        }
+
+        public static void ResetFillAmount() 
+        {
+            current_fill_amount = 0;
+            EventManager.FillChanged?.Invoke();
+        }
+
+
+        #endregion
+        #region LevelDialog
+
+        public static readonly string level_dialog_score_text = "SCORE:";
+        public static readonly string level_dialog_health_text = "XN:";
+        public static readonly string level_dialog_fill_text = "FILL:";
+        public static readonly string level_dialog_time_text = "TIME:";
 
         #endregion
 

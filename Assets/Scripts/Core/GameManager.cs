@@ -13,11 +13,15 @@ namespace Xonix.Core
         [SerializeField] private RectTransform enemiesContainer;
         [SerializeField] private RectTransform enemiesPoolContainer;
 
+        public static GameManager Instance;
+
         private Player player;
         private EnemyPool pool;
+        private float timePassed = 0;
 
         private void Awake()
         {
+            Instance = this;
             grid.Init();
             pool = new EnemyPool(this);
 
@@ -29,18 +33,6 @@ namespace Xonix.Core
             StartLevel(Parameters.level_games_played);
             //remove later
             Parameters.SwitchGameState(GameState.Playing);
-        }
-
-        // Start is called before the first frame update
-        void Start()
-        {
-            
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-        
         }
 
         private void StartLevel(int levelIndex) 
@@ -73,6 +65,12 @@ namespace Xonix.Core
             }
         }
 
+        public void ReturnToPool(Enemy enemy)
+        {
+            
+            pool.AddToPool(enemy);
+        }
+
         private void SpawnEnemies(EnemyType enemy, int count) 
         {
             for (int i = 0; i < count; i++)
@@ -83,6 +81,18 @@ namespace Xonix.Core
             }
         }
 
-        
+        private void Update()
+        {
+            if (Parameters.GameState == GameState.Playing)
+            {
+                timePassed += Time.deltaTime;
+                if (timePassed >= 1)
+                {
+                    Parameters.SubtractSeconds(1);
+                    timePassed -= 1;
+                }
+            }
+        }
+
     }
 }

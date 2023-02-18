@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Xonix.Common.Characters;
+using Xonix.Core;
 using Xonix.Data;
 
 namespace Xonix.Common.Grid
@@ -110,13 +111,21 @@ namespace Xonix.Common.Grid
 
         public void CheckKillEnemy(Vector2 point) 
         {
+            Enemy e = new Enemy();
             foreach (var enemy in enemies)
             {
                 if (enemy.GridPos == point)
                 {
-                    enemy.Kill();
-                    return;
+                    e = enemy;
+                    break;
                 }
+            }
+            if (e.GridPos != new Vector2())
+            {
+                enemies.Remove(e);
+                e.Kill();
+                GameManager.Instance.ReturnToPool(e);
+                Parameters.KillEnemy();
             }
         }
 

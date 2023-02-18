@@ -52,6 +52,7 @@ namespace Xonix.Common.Characters
         public void Kill() 
         {
             gameObject.SetActive(false);
+            moveDirection = Vector2.zero;
         }
 
         private Vector2 RandomizeMoveDirection() => new Vector2(Random.Range(0, 2) % 2 == 0 ? 1 : -1, Random.Range(0, 1) % 2 == 0 ? 1 : -1);
