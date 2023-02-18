@@ -126,21 +126,16 @@ namespace Xonix.Common.Grid
 
         public void CheckKillEnemy(Vector2 point) 
         {
-            Enemy e = new GameObject().AddComponent<Enemy>();
-            foreach (var enemy in enemies)
+            foreach (var enemy in enemies.ToList())
             {
                 if (enemy.GridPos == point)
                 {
-                    e = enemy;
+                    enemies.Remove(enemy);
+                    enemy.Kill();
+                    GameManager.Instance.ReturnToPool(enemy);
+                    Parameters.KillEnemy();
                     break;
                 }
-            }
-            if (e.GridPos != new Vector2())
-            {
-                enemies.Remove(e);
-                e.Kill();
-                GameManager.Instance.ReturnToPool(e);
-                Parameters.KillEnemy();
             }
         }
 
