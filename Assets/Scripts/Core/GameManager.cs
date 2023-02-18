@@ -22,6 +22,7 @@ namespace Xonix.Core
         private void Awake()
         {
             Instance = this;
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
             grid.Init();
             pool = new EnemyPool(this);
 

@@ -62,10 +62,6 @@ namespace Xonix.Common.Characters
             Stop();
             AudioController.Instance.PlayDamage();
             Parameters.LoseLife();
-            if (Parameters.player_hp == 0)
-            {
-                Application.Quit();
-            }
         }
 
         private void OnApplicationQuit()
