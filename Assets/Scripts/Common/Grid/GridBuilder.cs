@@ -46,7 +46,7 @@ namespace Xonix.Common.Grid
                 }
                 tileMap.Add(row);
             }
-            charactersMover.SetPlayerPosition(FindSpawnPos());
+            charactersMover.SetPlayerSpawnPos(FindSpawnPos());
             SetupGrid();
             trailTiles.Add(charactersMover.GetPlayerSpawnPos());
             Parameters.SetFillAmount(GetFilledAmount());
@@ -69,34 +69,9 @@ namespace Xonix.Common.Grid
             trailTiles.Add(pos);
         }
 
-        private void SetupGrid()
-        {
-            //possible different configurations of setup ground on grid (manual/ pixel map)
-            for (int i = 0; i < tileMap.Count; i++)
-            {
-                for (int j = 0; j < tileMap[i].Count; j++)
-                {
-                    if (i <= 1 || i >= tileMap.Count - 2 || j <= 1 || j >= tileMap[i].Count - 2)
-                    {
-                        tileMap[i][j].SetColor(Parameters.grid_color_ground);
-                    }
-                }
-            }
-        }
-
-        private float GetFilledAmount() 
-        {
-            int counter = 0;
-            foreach (var row in tileMap)
-            {
-                counter += row.Count(t => t.GetColor() == Parameters.grid_color_ground);
-            }
-            return counter / (tileMap.Count * tileMap[0].Count);
-        }
-
         public Vector2 FindSpawnPos() => Vector2.right * tileMap[0].Count / 2;
 
-        public Vector2 FindEnemySpawnPos(EnemyType enemyType) 
+        public Vector2 FindEnemySpawnPos(EnemyType enemyType)
         {
             List<Vector2> groundTiles = new List<Vector2>();
             List<Vector2> waterTiles = new List<Vector2>();
@@ -144,7 +119,7 @@ namespace Xonix.Common.Grid
             return tileMap[(int)index.y][(int)index.x].GetColor();
         }
 
-        public void SetTileColor(Vector2 index, Color color) 
+        public void SetTileColor(Vector2 index, Color color)
         {
             if (index.x < 0 || index.x >= GridWidth || index.y < 0 || index.y >= GridHeight)
             {
@@ -153,38 +128,19 @@ namespace Xonix.Common.Grid
             tileMap[(int)index.y][(int)index.x].SetColor(color);
         }
 
-        private Tile CreateTile(int x, int y)
-        {
-            GameObject go = new GameObject();
-            go.transform.SetParent(tilesContainer);
-            go.name = $"Tile [{x}][{y}]";
-            Tile tile = go.AddComponent<Tile>();
-            tile.Init();
-            tile.SetSize(Parameters.grid_tile_size);
-            tile.SetColor(Parameters.grid_color_water);
-            tile.setGridPos(x, y);
-            return tile;
-        }
-
-        private void Update()
-        {
-            charactersMover.MovePlayer();
-            charactersMover.MoveEnemies();
-        }
-
-        public bool[] FindCornerTiles(Vector2 pos, Vector2 dir, EnemyType enemyType) 
+        public bool[] FindCornerTiles(Vector2 pos, Vector2 dir, EnemyType enemyType)
         {
             //x, -y, x-y
             bool[] cornerTiles = new bool[3];
             Color tempCol;
-            if (pos.x + dir.x <0 || pos.x + dir.x >= tileMap[0].Count)
+            if (pos.x + dir.x < 0 || pos.x + dir.x >= tileMap[0].Count)
             {
                 cornerTiles[0] = true;
                 cornerTiles[2] = true;
             }
             else
             {
-                tempCol = tileMap[ (int) pos.y][ (int) (pos.x + dir.x)].GetColor();
+                tempCol = tileMap[(int)pos.y][(int)(pos.x + dir.x)].GetColor();
                 cornerTiles[0] = IsObstacleColor(tempCol, enemyType);
                 if (new Vector2(pos.x + dir.x, pos.y) == charactersMover.GetPlayerPos())
                 {
@@ -199,9 +155,9 @@ namespace Xonix.Common.Grid
             }
             else
             {
-                tempCol = tileMap[ (int) (pos.y - dir.y)][ (int) pos.x].GetColor();
+                tempCol = tileMap[(int)(pos.y - dir.y)][(int)pos.x].GetColor();
                 cornerTiles[1] = IsObstacleColor(tempCol, enemyType);
-                if (new Vector2(pos.x ,pos.y - dir.y) == charactersMover.GetPlayerPos())
+                if (new Vector2(pos.x, pos.y - dir.y) == charactersMover.GetPlayerPos())
                 {
                     cornerTiles[1] = true;
                     charactersMover.Damage();
@@ -220,7 +176,7 @@ namespace Xonix.Common.Grid
             return cornerTiles;
         }
 
-        public bool IsObstacleColor(Color color, EnemyType enemy) 
+        public bool IsObstacleColor(Color color, EnemyType enemy)
         {
             if (color == Parameters.grid_color_ground)
             {
@@ -244,7 +200,7 @@ namespace Xonix.Common.Grid
             return false;
         }
 
-        public void ClearTrail(Vector2 currentPlayerPos, bool delete = false) 
+        public void ClearTrail(Vector2 currentPlayerPos, bool delete = false)
         {
             foreach (var vec in trailTiles)
             {
@@ -255,6 +211,50 @@ namespace Xonix.Common.Grid
             }
             trailTiles.Clear();
             trailTiles.Add(currentPlayerPos);
+        }
+
+        private void SetupGrid()
+        {
+            //possible different configurations of setup ground on grid (manual/ pixel map)
+            for (int i = 0; i < tileMap.Count; i++)
+            {
+                for (int j = 0; j < tileMap[i].Count; j++)
+                {
+                    if (i <= 1 || i >= tileMap.Count - 2 || j <= 1 || j >= tileMap[i].Count - 2)
+                    {
+                        tileMap[i][j].SetColor(Parameters.grid_color_ground);
+                    }
+                }
+            }
+        }
+
+        private float GetFilledAmount() 
+        {
+            int counter = 0;
+            foreach (var row in tileMap)
+            {
+                counter += row.Count(t => t.GetColor() == Parameters.grid_color_ground);
+            }
+            return counter / (tileMap.Count * tileMap[0].Count);
+        }
+
+        private Tile CreateTile(int x, int y)
+        {
+            GameObject go = new GameObject();
+            go.transform.SetParent(tilesContainer);
+            go.name = $"Tile [{x}][{y}]";
+            Tile tile = go.AddComponent<Tile>();
+            tile.Init();
+            tile.SetSize(Parameters.grid_tile_size);
+            tile.SetColor(Parameters.grid_color_water);
+            tile.setGridPos(x, y);
+            return tile;
+        }
+
+        private void Update()
+        {
+            charactersMover.MovePlayer();
+            charactersMover.MoveEnemies();
         }
 
         private void OnTakenDamage() 

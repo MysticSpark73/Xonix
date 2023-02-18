@@ -16,14 +16,12 @@ namespace Xonix.Common.Characters
         public Vector2 GridPos => gridPos;
 
         private Vector2 moveDirection;
-        private Vector2 spawnPos;
         private Vector2 gridPos;
         private bool isSwiming;
 
         public void Init(Vector2 gridPos) 
         {
-            spawnPos = GridPosToAnchor(gridPos);
-            self.anchoredPosition = spawnPos;
+            SetPos(gridPos);
             SetIsSwiming(false);
             Subscribe();
         }

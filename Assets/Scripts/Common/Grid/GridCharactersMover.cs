@@ -12,7 +12,6 @@ namespace Xonix.Common.Grid
         private float enemiesMoveTime;
 
         private Player player;
-        //private Vector2 playerGridPos;
         private Vector2 playerSpawnPos;
         private List<Enemy> enemies;
 
@@ -32,11 +31,6 @@ namespace Xonix.Common.Grid
         {
             enemies.Add(en);
             en.SetPos(grid.FindEnemySpawnPos(en.EnemyType));
-        }
-
-        public void SetPlayerPosition(Vector2 gridPos)
-        {
-            player.SetPos(gridPos);
         }
 
         public void SetPlayerSpawnPos(Vector2 pos) => playerSpawnPos = pos;
